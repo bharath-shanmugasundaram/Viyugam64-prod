@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.next/
+out/
+
+# Environment
+.env.local
+.env
+
+# Database
+*.db
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# HF Space clone
+hf-space/
+
+# Deploy folder (already on HF)
+deploy-backend/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# ChessAutomator — large dataset/model files (keep only what backend needs)
+ChessAutomator/
