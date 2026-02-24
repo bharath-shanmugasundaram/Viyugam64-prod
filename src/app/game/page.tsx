@@ -61,9 +61,9 @@ function GameContent() {
                 // Mobile: board fills width with padding
                 setBoardWidth(Math.min(vw - 24, vh - 200));
             } else {
-                // Desktop: board fills left area, max 580px
-                const availableHeight = vh - 140; // header + player bars
-                const availableWidth = Math.min(vw * 0.55, 580);
+                // Desktop: board fills left area, max 720px
+                const availableHeight = vh - 120; // header + player bars
+                const availableWidth = Math.min(vw * 0.58, 720);
                 setBoardWidth(Math.min(availableWidth, availableHeight));
             }
         };
