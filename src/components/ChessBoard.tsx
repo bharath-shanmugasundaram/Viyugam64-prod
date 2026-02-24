@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Square, Move } from 'chess.js';
 
@@ -181,6 +181,33 @@ export default function ChessBoardComponent({
         return styles;
     }, [lastMove, selectedSquare, legalMoves, game]);
 
+    // Neo piece set (Chess.com style)
+    const neoPieces = useMemo(() => {
+        const pieceMap: Record<string, string> = {
+            wP: 'wp', wN: 'wn', wB: 'wb', wR: 'wr', wQ: 'wq', wK: 'wk',
+            bP: 'bp', bN: 'bn', bB: 'bb', bR: 'br', bQ: 'bq', bK: 'bk',
+        };
+
+        const pieces: Record<string, (props?: { square?: string }) => React.JSX.Element> = {};
+
+        for (const [key, filename] of Object.entries(pieceMap)) {
+            pieces[key] = (props) => (
+                <img
+                    src={`https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${filename}.png`}
+                    alt={key}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        pointerEvents: 'none',
+                    }}
+                />
+            );
+        }
+
+        return pieces;
+    }, []);
+
     return (
         <div className="chess-board-container" style={{ width: boardWidth, height: boardWidth }}>
             <Chessboard
@@ -192,6 +219,7 @@ export default function ChessBoardComponent({
                     canDragPiece,
                     boardOrientation,
                     squareStyles: customSquareStyles,
+                    pieces: neoPieces,
                     boardStyle: {
                         borderRadius: '6px',
                         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
