@@ -48,6 +48,14 @@ function CapturedPieces({ pieces, color }: { pieces: PieceSymbol[]; color: 'whit
     );
 }
 
+/** Format seconds to M:SS or 0:SS */
+function formatTime(seconds: number): string {
+    if (seconds < 0) seconds = 0;
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 /** Player bar — displayed above or below the board */
 export function PlayerBar({
     name,
@@ -57,6 +65,7 @@ export function PlayerBar({
     capturedPieces,
     capturedColor,
     position,
+    timeLeft,
 }: {
     name: string;
     isAI: boolean;
@@ -65,7 +74,11 @@ export function PlayerBar({
     capturedPieces: PieceSymbol[];
     capturedColor: 'white' | 'black';
     position: 'top' | 'bottom';
+    timeLeft?: number; // seconds remaining
 }) {
+    const isLowTime = timeLeft !== undefined && timeLeft <= 30;
+    const isCriticalTime = timeLeft !== undefined && timeLeft <= 10;
+
     return (
         <div className={`player-bar ${position} ${isActive ? 'active' : ''}`}>
             <div className="player-bar-left">
@@ -82,8 +95,13 @@ export function PlayerBar({
                         </span>
                     )}
                 </div>
+                <CapturedPieces pieces={capturedPieces} color={capturedColor} />
             </div>
-            <CapturedPieces pieces={capturedPieces} color={capturedColor} />
+            {timeLeft !== undefined && (
+                <div className={`chess-clock ${isActive ? 'clock-active' : 'clock-inactive'} ${isLowTime ? 'clock-low' : ''} ${isCriticalTime ? 'clock-critical' : ''}`}>
+                    {formatTime(timeLeft)}
+                </div>
+            )}
         </div>
     );
 }
@@ -105,8 +123,6 @@ export default function GameInfo({
 }: GameInfoProps) {
     return (
         <>
-            {/* This component is no longer rendered as a side panel block.
-          The PlayerBars are used directly in the game page layout instead. */}
             {isCheck && !isGameOver && (
                 <div className="check-alert">⚠ Check!</div>
             )}

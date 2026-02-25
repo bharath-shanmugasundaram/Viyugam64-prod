@@ -36,7 +36,7 @@ function GameContent() {
     const [capturedByPlayer, setCapturedByPlayer] = useState<PieceSymbol[]>([]);
     const [capturedByAI, setCapturedByAI] = useState<PieceSymbol[]>([]);
     const [gameResult, setGameResult] = useState<
-        'checkmate-player' | 'checkmate-ai' | 'stalemate' | 'draw' | 'resign' | null
+        'checkmate-player' | 'checkmate-ai' | 'stalemate' | 'draw' | 'resign' | 'timeout-player' | 'timeout-ai' | null
     >(null);
     const [showGameOver, setShowGameOver] = useState(false);
     const [showConfirmRestart, setShowConfirmRestart] = useState(false);
@@ -44,9 +44,17 @@ function GameContent() {
     const [soundEnabled, setSoundEnabled] = useState(true);
     const [boardWidth, setBoardWidth] = useState(560);
 
+    // Chess clocks — 2 minutes (120 seconds) per player
+    const INITIAL_TIME = 120;
+    const [whiteTime, setWhiteTime] = useState(INITIAL_TIME);
+    const [blackTime, setBlackTime] = useState(INITIAL_TIME);
+    const [clockRunning, setClockRunning] = useState(false);
+
     const gameRef = useRef(game);
     gameRef.current = game;
     const isAIThinkingRef = useRef(false);
+    const gameResultRef = useRef(gameResult);
+    gameResultRef.current = gameResult;
 
     // Initialize sound and calculate board size
     useEffect(() => {
@@ -72,6 +80,52 @@ function GameContent() {
         window.addEventListener('resize', updateBoardSize);
         return () => window.removeEventListener('resize', updateBoardSize);
     }, []);
+
+    // Chess clock countdown (ticks every 100ms for smooth display)
+    useEffect(() => {
+        if (!clockRunning || gameResult) return;
+
+        const interval = setInterval(() => {
+            const currentGame = gameRef.current;
+            if (currentGame.isGameOver() || gameResultRef.current) {
+                setClockRunning(false);
+                return;
+            }
+
+            if (currentGame.turn() === 'w') {
+                setWhiteTime(prev => {
+                    if (prev <= 0.1) {
+                        // AI (white) ran out of time — player wins!
+                        setGameResult('timeout-ai');
+                        setShowGameOver(true);
+                        setClockRunning(false);
+                        // Add to leaderboard
+                        const playerMoves = Math.ceil(currentGame.moveNumber() / 2);
+                        addLeaderboardEntry({
+                            player_name: playerName,
+                            moves: playerMoves,
+                            date_played: new Date().toISOString(),
+                        });
+                        return 0;
+                    }
+                    return prev - 0.1;
+                });
+            } else {
+                setBlackTime(prev => {
+                    if (prev <= 0.1) {
+                        // Player (black) ran out of time — AI wins!
+                        setGameResult('timeout-player');
+                        setShowGameOver(true);
+                        setClockRunning(false);
+                        return 0;
+                    }
+                    return prev - 0.1;
+                });
+            }
+        }, 100);
+
+        return () => clearInterval(interval);
+    }, [clockRunning, gameResult, playerName]);
 
     // AI makes the first move (White)
     useEffect(() => {
@@ -141,7 +195,9 @@ function GameContent() {
                 setGame(newGame);
                 setMoveHistory(prev => [...prev, move.san]);
                 setLastMove({ from: move.from, to: move.to });
-                checkGameEnd(newGame);
+                if (!checkGameEnd(newGame)) {
+                    setClockRunning(true); // Start/continue clock after AI moves
+                }
             }
         } catch (e) {
             console.error('AI move error:', e);
@@ -173,7 +229,10 @@ function GameContent() {
             setLastMove({ from: move.from, to: move.to });
 
             if (!checkGameEnd(newGame)) {
+                setClockRunning(true); // Clock keeps running
                 setTimeout(() => makeAIMove(), 100);
+            } else {
+                setClockRunning(false);
             }
         },
         [game, checkGameEnd, makeAIMove]
@@ -191,6 +250,10 @@ function GameContent() {
         setShowConfirmRestart(false);
         isAIThinkingRef.current = false;
         setIsAIThinking(false);
+        // Reset clocks
+        setWhiteTime(INITIAL_TIME);
+        setBlackTime(INITIAL_TIME);
+        setClockRunning(false);
         soundManager.play('gameStart');
 
         setTimeout(() => makeAIMove(), 500);
@@ -213,18 +276,19 @@ function GameContent() {
                     <PlayerBar
                         name="Viyugam AI"
                         isAI={true}
-                        isActive={game.turn() === 'w' && !game.isGameOver()}
+                        isActive={game.turn() === 'w' && !game.isGameOver() && !gameResult}
                         isThinking={isAIThinking}
                         capturedPieces={capturedByAI}
                         capturedColor="black"
                         position="top"
+                        timeLeft={Math.round(whiteTime * 10) / 10}
                     />
 
                     {/* Chess Board */}
                     <ChessBoardComponent
                         game={game}
                         onMove={handlePlayerMove}
-                        isPlayerTurn={game.turn() === 'b' && !isAIThinking && !game.isGameOver()}
+                        isPlayerTurn={game.turn() === 'b' && !isAIThinking && !game.isGameOver() && !gameResult}
                         boardOrientation="black"
                         lastMove={lastMove}
                         boardWidth={boardWidth}
@@ -234,10 +298,11 @@ function GameContent() {
                     <PlayerBar
                         name={playerName}
                         isAI={false}
-                        isActive={game.turn() === 'b' && !game.isGameOver()}
+                        isActive={game.turn() === 'b' && !game.isGameOver() && !gameResult}
                         capturedPieces={capturedByPlayer}
                         capturedColor="white"
                         position="bottom"
+                        timeLeft={Math.round(blackTime * 10) / 10}
                     />
                 </div>
 

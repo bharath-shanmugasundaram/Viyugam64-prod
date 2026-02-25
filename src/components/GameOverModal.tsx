@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 
 interface GameOverModalProps {
     isOpen: boolean;
-    result: 'checkmate-player' | 'checkmate-ai' | 'stalemate' | 'draw' | 'resign' | null;
+    result: 'checkmate-player' | 'checkmate-ai' | 'stalemate' | 'draw' | 'resign' | 'timeout-player' | 'timeout-ai' | null;
     playerName: string;
     moveCount: number;
     onPlayAgain: () => void;
@@ -24,7 +24,9 @@ export default function GameOverModal({
     const getTitle = () => {
         switch (result) {
             case 'checkmate-player': return '🎉 Congratulations!';
+            case 'timeout-ai': return '⏱️ Time\'s Up!';
             case 'checkmate-ai': return 'Game Over';
+            case 'timeout-player': return '⏱️ Out of Time!';
             case 'stalemate': return 'Stalemate!';
             case 'draw': return 'Draw!';
             case 'resign': return 'Game Over';
@@ -36,8 +38,12 @@ export default function GameOverModal({
         switch (result) {
             case 'checkmate-player':
                 return `${playerName}, you defeated the AI in ${moveCount} moves!`;
+            case 'timeout-ai':
+                return `${playerName}, the AI ran out of time! You win!`;
             case 'checkmate-ai':
                 return `The AI wins by checkmate. Better luck next time!`;
+            case 'timeout-player':
+                return `You ran out of time! The AI wins on time.`;
             case 'stalemate':
                 return 'The game ended in a stalemate. Neither side wins.';
             case 'draw':
@@ -49,7 +55,7 @@ export default function GameOverModal({
         }
     };
 
-    const isWin = result === 'checkmate-player';
+    const isWin = result === 'checkmate-player' || result === 'timeout-ai';
 
     return (
         <div className="modal-overlay">

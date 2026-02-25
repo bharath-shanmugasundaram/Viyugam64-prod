@@ -437,6 +437,53 @@ h4 {
   }
 }
 
+/* --- Chess Clock --- */
+.chess-clock {
+  font-family: 'Courier New', 'SF Mono', 'Consolas', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  min-width: 60px;
+  text-align: center;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.clock-inactive {
+  background-color: var(--bg-input);
+  color: var(--text-muted);
+}
+
+.clock-active {
+  background-color: #fff;
+  color: #1a1917;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.15);
+}
+
+.clock-low.clock-active {
+  background-color: #f5a623;
+  color: #1a1917;
+}
+
+.clock-critical.clock-active {
+  background-color: #e74c3c;
+  color: #fff;
+  animation: clock-flash 0.5s ease-in-out infinite;
+}
+
+@keyframes clock-flash {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
 /* Captured pieces row */
 .captured-row {
   display: flex;
