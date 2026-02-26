@@ -305,6 +305,15 @@ def add_leaderboard_entry(entry: LeaderboardEntry):
         }
 
 
+@app.delete("/api/leaderboard")
+def reset_leaderboard():
+    """Clear all leaderboard entries."""
+    with get_db() as conn:
+        conn.execute("DELETE FROM leaderboard")
+        conn.commit()
+    return {"status": "ok", "message": "Leaderboard cleared"}
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "model_loaded": model_loaded, "device": DEVICE}

@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getLeaderboard, LeaderboardEntry } from '@/lib/api';
 import LeaderboardTable from '@/components/LeaderboardTable';
-import { Trophy, Swords, BookOpen } from 'lucide-react';
+import { Trophy, Swords, BookOpen, Brain, Cpu } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
   const [playerName, setPlayerName] = useState('');
   const [error, setError] = useState('');
+  const [difficulty, setDifficulty] = useState<'easy' | 'hard'>('easy');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +34,7 @@ export default function LandingPage() {
     }
     setLoading(true);
     localStorage.setItem('chess-player-name', trimmed);
-    router.push(`/game?player=${encodeURIComponent(trimmed)}`);
+    router.push(`/game?player=${encodeURIComponent(trimmed)}&difficulty=${difficulty}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -72,6 +73,36 @@ export default function LandingPage() {
             />
             {error && <p className="input-error">{error}</p>}
           </div>
+
+          {/* Difficulty Selector */}
+          <div className="difficulty-selector">
+            <label className="input-label">Difficulty</label>
+            <div className="difficulty-options">
+              <button
+                className={`difficulty-btn ${difficulty === 'easy' ? 'selected' : ''}`}
+                onClick={() => setDifficulty('easy')}
+                type="button"
+              >
+                <Brain size={20} />
+                <div className="difficulty-btn-text">
+                  <span className="difficulty-btn-title">Easy</span>
+                  <span className="difficulty-btn-desc">CNN Model</span>
+                </div>
+              </button>
+              <button
+                className={`difficulty-btn ${difficulty === 'hard' ? 'selected' : ''}`}
+                onClick={() => setDifficulty('hard')}
+                type="button"
+              >
+                <Cpu size={20} />
+                <div className="difficulty-btn-text">
+                  <span className="difficulty-btn-title">Hard</span>
+                  <span className="difficulty-btn-desc">Minimax Engine</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
           <button
             className="btn btn-primary btn-large start-btn"
             onClick={handleStart}

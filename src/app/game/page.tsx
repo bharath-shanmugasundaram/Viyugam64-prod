@@ -8,7 +8,7 @@ import { PlayerBar } from '@/components/GameInfo';
 import MoveHistory from '@/components/MoveHistory';
 import GameOverModal from '@/components/GameOverModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { getBestMove } from '@/lib/engine';
+import { getBestMove, Difficulty } from '@/lib/engine';
 import { soundManager } from '@/lib/sounds';
 import { addLeaderboardEntry } from '@/lib/api';
 import { RotateCcw, LogOut, Volume2, VolumeX, Settings } from 'lucide-react';
@@ -27,6 +27,7 @@ function GameContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const playerName = searchParams.get('player') || 'Player';
+    const difficulty = (searchParams.get('difficulty') || 'easy') as Difficulty;
 
     // Game state
     const [game, setGame] = useState(new Chess());
@@ -178,7 +179,7 @@ function GameContent() {
         setIsAIThinking(true);
 
         try {
-            const result = await getBestMove(gameRef.current.fen(), 3);
+            const result = await getBestMove(gameRef.current.fen(), difficulty);
             if (!result.bestMove) return;
 
             const newGame = new Chess(gameRef.current.fen());
@@ -311,6 +312,7 @@ function GameContent() {
                     {/* Game title bar */}
                     <div className="panel-header">
                         <span className="panel-header-title">♟ Play vs AI</span>
+                        <span className={`difficulty-badge ${difficulty}`}>{difficulty === 'easy' ? 'Easy' : 'Hard'}</span>
                         <button
                             className="icon-btn"
                             onClick={toggleSound}

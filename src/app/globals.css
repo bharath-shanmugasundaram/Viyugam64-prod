@@ -255,6 +255,76 @@ h4 {
   width: 100%;
 }
 
+/* Difficulty Selector */
+.difficulty-selector {
+  margin-bottom: 8px;
+}
+
+.difficulty-options {
+  display: flex;
+  gap: 8px;
+}
+
+.difficulty-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius);
+  background-color: var(--bg-input);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.difficulty-btn:hover {
+  border-color: var(--text-muted);
+}
+
+.difficulty-btn.selected {
+  border-color: var(--accent);
+  background-color: rgba(129, 161, 78, 0.12);
+  color: var(--text-primary);
+}
+
+.difficulty-btn-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.difficulty-btn-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.difficulty-btn-desc {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* Difficulty Badge (in game panel) */
+.difficulty-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+
+.difficulty-badge.easy {
+  background-color: rgba(129, 161, 78, 0.2);
+  color: var(--accent);
+}
+
+.difficulty-badge.hard {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+}
+
 /* Instructions */
 .instructions {
   background-color: var(--bg-sidebar);

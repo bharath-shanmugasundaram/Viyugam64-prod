@@ -209,17 +209,24 @@ function getMinimaxMove(fen: string, depth: number): { bestMove: string | null; 
 
 // --- Public API ---
 
+export type Difficulty = 'easy' | 'hard';
+
 export async function getBestMove(
     fen: string,
-    depth: number = 3
+    difficulty: Difficulty = 'easy'
 ): Promise<{ bestMove: string | null; evaluation: number; source: string }> {
-    // Try CNN model first
-    const cnnMove = await getCNNMove(fen);
-    if (cnnMove) {
-        return { bestMove: cnnMove, evaluation: 0, source: 'cnn' };
+    if (difficulty === 'easy') {
+        // Easy: Use CNN model (user's trained model)
+        const cnnMove = await getCNNMove(fen);
+        if (cnnMove) {
+            return { bestMove: cnnMove, evaluation: 0, source: 'cnn' };
+        }
+        // If CNN fails, use shallow minimax as fallback
+        const result = getMinimaxMove(fen, 2);
+        return { ...result, source: 'minimax-fallback' };
+    } else {
+        // Hard: Use strong minimax engine (depth 4)
+        const result = getMinimaxMove(fen, 4);
+        return { ...result, source: 'minimax' };
     }
-
-    // Fall back to minimax
-    const result = getMinimaxMove(fen, depth);
-    return { ...result, source: 'minimax' };
 }
