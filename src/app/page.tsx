@@ -86,7 +86,6 @@ export default function LandingPage() {
                 <Brain size={20} />
                 <div className="difficulty-btn-text">
                   <span className="difficulty-btn-title">Easy</span>
-                  <span className="difficulty-btn-desc">CNN Model</span>
                 </div>
               </button>
               <button
@@ -97,7 +96,6 @@ export default function LandingPage() {
                 <Cpu size={20} />
                 <div className="difficulty-btn-text">
                   <span className="difficulty-btn-title">Hard</span>
-                  <span className="difficulty-btn-desc">Classic Engine</span>
                 </div>
               </button>
             </div>
