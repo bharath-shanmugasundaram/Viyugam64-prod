@@ -97,7 +97,7 @@ export default function LandingPage() {
                 <Cpu size={20} />
                 <div className="difficulty-btn-text">
                   <span className="difficulty-btn-title">Hard</span>
-                  <span className="difficulty-btn-desc">Minimax Engine</span>
+                  <span className="difficulty-btn-desc">Classic Engine</span>
                 </div>
               </button>
             </div>

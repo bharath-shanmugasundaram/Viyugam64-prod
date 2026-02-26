@@ -225,8 +225,8 @@ export async function getBestMove(
         const result = getMinimaxMove(fen, 2);
         return { ...result, source: 'minimax-fallback' };
     } else {
-        // Hard: Use strong minimax engine (depth 4)
-        const result = getMinimaxMove(fen, 4);
+        // Hard: Use strong engine (depth 3)
+        const result = getMinimaxMove(fen, 3);
         return { ...result, source: 'minimax' };
     }
 }
